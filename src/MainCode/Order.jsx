@@ -1,0 +1,346 @@
+import React, { useState } from "react";
+
+const Order = () => {
+  const [orders, setOrders] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [items, setItems] = useState([]);
+  const [formData, setFormData] = useState({
+    orderNumber: "ODR#001",
+    client: "",
+    billingAddress: "",
+    shippingAddress: "",
+    project: "",
+    generatedBy: "Worksuite",
+    status: "Pending",
+    product: "",
+    discount: "",
+    tax: "",
+    note: "",
+  });
+
+  const handleInput = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleAddItem = () => {
+    setItems((prev) => [...prev, { name: "", price: "" }]);
+  };
+
+  const handleItemChange = (index, key, value) => {
+    const updated = [...items];
+    updated[index][key] = value;
+    setItems(updated);
+  };
+
+  const handleSubmit = () => {
+    if (items.length === 0) return alert("Add at least 1 item.");
+    const total =
+      items.reduce((sum, item) => sum + Number(item.price || 0), 0) -
+      Number(formData.discount || 0) +
+      Number(formData.tax || 0);
+    setOrders((prev) => [
+      ...prev,
+      {
+        number: formData.orderNumber,
+        client: formData.client,
+        total: `$${total.toFixed(2)}`,
+        date: new Date().toLocaleDateString(),
+        status: formData.status,
+      },
+    ]);
+    setShowForm(false);
+    setFormData({
+      orderNumber: `ODR#00${orders.length + 2}`,
+      client: "",
+      billingAddress: "",
+      shippingAddress: "",
+      project: "",
+      generatedBy: "Worksuite",
+      status: "Pending",
+      product: "",
+      discount: "",
+      tax: "",
+      note: "",
+    });
+    setItems([]);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 space-y-6">
+      {/* Breadcrumb */}
+      <div className="text-sm text-gray-500">
+        Home &gt; Orders &gt;{" "}
+        <span className="text-gray-700 font-medium">
+          {showForm ? "Create Order" : "Orders"}
+        </span>
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {showForm ? "Create Order" : "Orders"}
+        </h2>
+        {!showForm && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600"
+            >
+              + Add New Order
+            </button>
+            <button className="bg-white border px-4 py-2 rounded text-sm text-gray-700">
+              Export
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Filters */}
+      {!showForm && (
+        <div className="grid grid-cols-4 gap-4 text-sm mt-4">
+          <input
+            type="text"
+            placeholder="Start Date To End Date"
+            className="border rounded px-3 py-2 bg-white placeholder-gray-400"
+          />
+          <select className="border rounded px-3 py-2 bg-white">
+            <option>Client</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Start typing to search"
+            className="border rounded px-3 py-2 bg-white placeholder-gray-400"
+          />
+          <button className="border rounded px-3 py-2 bg-white text-gray-700 flex items-center justify-center gap-2">
+            <span>🔍</span> Filters
+          </button>
+        </div>
+      )}
+
+      {/* Form */}
+      {showForm && (
+        <div className="bg-white rounded shadow p-6 space-y-6">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <label>Order Number</label>
+              <input
+                type="text"
+                value={formData.orderNumber}
+                onChange={(e) => handleInput("orderNumber", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              />
+            </div>
+            <div>
+              <label>Client</label>
+              <select
+                value={formData.client}
+                onChange={(e) => handleInput("client", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              >
+                <option value="">Add</option>
+              </select>
+            </div>
+            <div className="col-span-2 text-gray-500">
+              Select the client to show billing address.
+            </div>
+            <div className="col-span-2">
+              <button className="text-blue-600 text-sm">+ Add Shipping Address</button>
+            </div>
+            <div>
+              <label>Project</label>
+              <select
+                value={formData.project}
+                onChange={(e) => handleInput("project", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              >
+                <option value="">Select</option>
+              </select>
+            </div>
+            <div>
+              <label>Generated By</label>
+              <select
+                value={formData.generatedBy}
+                onChange={(e) => handleInput("generatedBy", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              >
+                <option>Worksuite</option>
+              </select>
+            </div>
+            <div>
+              <label>Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => handleInput("status", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              >
+                <option>Pending</option>
+                <option>Confirmed</option>
+              </select>
+            </div>
+            <div>
+              <label>Select Product</label>
+              <select
+                value={formData.product}
+                onChange={(e) => handleInput("product", e.target.value)}
+                className="border px-3 py-2 rounded w-full"
+              >
+                <option value="">Select</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Items */}
+          <div className="space-y-2">
+            {items.length === 0 && (
+              <div className="text-red-500 text-sm">Add at least 1 item.</div>
+            )}
+            {items.map((item, i) => (
+              <div key={i} className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="Item Name"
+                  value={item.name}
+                  onChange={(e) => handleItemChange(i, "name", e.target.value)}
+                  className="border px-3 py-2 rounded"
+                />
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={item.price}
+                  onChange={(e) => handleItemChange(i, "price", e.target.value)}
+                  className="border px-3 py-2 rounded"
+                />
+              </div>
+            ))}
+            <button
+              onClick={handleAddItem}
+              className="text-blue-600 text-sm mt-2"
+            >
+              + Add Item
+            </button>
+          </div>
+
+          {/* Totals */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <input
+              type="number"
+              placeholder="Discount"
+              value={formData.discount}
+              onChange={(e) => handleInput("discount", e.target.value)}
+              className="border px-3 py-2 rounded"
+            />
+            <input
+              type="number"
+              placeholder="Tax"
+              value={formData.tax}
+              onChange={(e) => handleInput("tax", e.target.value)}
+              className="border px-3 py-2 rounded"
+            />
+          </div>
+
+          {/* Note */}
+          <textarea
+            placeholder="Client Note"
+            value={formData.note}
+            onChange={(e) => handleInput("note", e.target.value)}
+            className="border px-3 py-2 rounded w-full h-24"
+          />
+
+          {/* Actions */}
+          <div className="flex gap-4 mt-6">
+            <button
+              onClick={handleSubmit}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Submit
+            </button>
+               <button
+              onClick={() => {
+                setShowForm(false);
+                setFormData({
+                  orderNumber: `ODR#00${orders.length + 2}`,
+                  client: "",
+                  billingAddress: "",
+                  shippingAddress: "",
+                  project: "",
+                  generatedBy: "Worksuite",
+                  status: "Pending",
+                  product: "",
+                  discount: "",
+                  tax: "",
+                  note: "",
+                });
+                setItems([]);
+              }}
+              className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
+      {!showForm && (
+        <div className="bg-white rounded shadow overflow-x-auto mt-4">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="p-3 border text-left">Order Number</th>
+                <th className="p-3 border text-left">Client</th>
+                <th className="p-3 border text-left">Total</th>
+                <th className="p-3 border text-left">Order Date</th>
+                <th className="p-3 border text-left">Status</th>
+                <th className="p-3 border text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="p-4 text-center text-gray-500">
+                    No data available in table
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order, i) => (
+                  <tr key={i}>
+                    <td className="p-3 border text-center">{order.number}</td>
+                    <td className="p-3 border text-center">{order.client}</td>
+                    <td className="p-3 border text-center">{order.total}</td>
+                    <td className="p-3 border text-center">{order.date}</td>
+                    <td className="p-3 border text-center">{order.status}</td>
+                    <td className="p-3 border text-center">
+                      <button className="text-gray-700 border px-2 py-1 rounded text-sm hover:bg-gray-100">
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          {/* Pagination */}
+          <div className="flex justify-between items-center px-4 py-3 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <label>Show</label>
+              <select className="border rounded px-2 py-1 bg-white">
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <div>
+              Showing 1 to {orders.length} of {orders.length} entries
+              <span className="ml-4 text-gray-400">Previous</span>
+              <span className="ml-2 text-gray-400">Next</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Order;
