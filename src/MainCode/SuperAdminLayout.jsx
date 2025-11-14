@@ -6,6 +6,7 @@ import AddPackage from "./AddPackage";
 import Company from "./Company";
 import AdminFAQ from "./AdminFAQ";
 import AddSuperAdmin from "./AddSuperAdmin";
+import Navbar from "./Navbar";
 
 const SuperAdminLayout = () => {
   const [activePage, setActivePage] = useState("Dashboard"); // default
@@ -14,15 +15,14 @@ const SuperAdminLayout = () => {
     switch (activePage) {
       case "Dashboard":
         return <SuperAdminDashboard />;
-         case "Packages": // ✅ when sidebar item "Packages" is clicked
+      case "Packages":
         return <AddPackage />;
-         case "Companies":
-        return <Company/>
-         case "Admin FAQ":
-        return <AdminFAQ/>
-         case "Super Admin":
-        return <AddSuperAdmin/>
-      // Add more cases later (Packages, Companies, etc.)
+      case "Companies":
+        return <Company />;
+      case "Admin FAQ":
+        return <AdminFAQ />;
+      case "Super Admin":
+        return <AddSuperAdmin />;
       default:
         return <div className="p-6">Page not found</div>;
     }
@@ -30,11 +30,20 @@ const SuperAdminLayout = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <SuperAdminSidebar setActivePage={setActivePage} activePage={activePage} />
+      {/* SIDEBAR */}
+      <SuperAdminSidebar
+        setActivePage={setActivePage}
+        activePage={activePage}
+      />
 
-      {/* Main Content */}
-      <div className="flex-1 bg-gray-100">{renderPage()}</div>
+      {/* MAIN AREA */}
+      <div className="flex-1 bg-gray-100 flex flex-col">
+        {/* 🔥 NAVBAR ALWAYS ON TOP + REAL-TIME ACTIVE PAGE */}
+        <Navbar activePage={activePage} />
+
+        {/* 🔥 PAGE CONTENT BELOW NAVBAR */}
+        <div className="p-4">{renderPage()}</div>
+      </div>
     </div>
   );
 };

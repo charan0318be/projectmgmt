@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
+import Navbar from "./Navbar";
 
 const ClientLayout = () => {
   return (
@@ -12,6 +13,7 @@ const ClientLayout = () => {
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto p-6">
+         <Navbar />
         <Outlet /> {/* This will render the child page */}
       </div>
     </div>
