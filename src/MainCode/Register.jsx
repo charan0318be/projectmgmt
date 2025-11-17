@@ -39,7 +39,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post("https://projectmgmt-ooj6.onrender.com/api/register",
+      const response = await axios.post("https://projectmgmt-1.onrender.com/api/register",
         formData
       );
       setMessage("Registration successful!");
